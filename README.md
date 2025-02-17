@@ -10,3 +10,6 @@ Within the writeup they build this regression, which the model will investigate.
 
 Developing a model based on the 3 day absolute change in VIX
 ![image](https://github.com/user-attachments/assets/b8724ef0-4243-4ed1-b07e-29cd6efeca09)
+
+The cumulative returns of the signal
+![image](https://github.com/user-attachments/assets/29764c10-b3a3-4d3f-b38d-e93035398943)
