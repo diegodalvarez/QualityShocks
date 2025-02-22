@@ -19,8 +19,18 @@ class FullSampleRegression(DataCollect):
     def __init__(self) -> None:
         
         super().__init__()
-        self.full_sample = os.path.join(self.data_path, "FulLSampleRegression")
+        self.full_sample = os.path.join(self.data_path, "FullSampleRegression")
         if os.path.exists(self.full_sample) == False: os.makedirs(self.full_sample)
+        
+    def prep_quality(self) -> pd.DataFrame: 
+        
+        df_out = (pd.concat([
+            self._get_bloomberg().assign(source = "bloomberg"),
+            self._get_jpm().assign(source = "JPM"),
+            self._get_qmj().assign(source = "AQR")]).
+            assign(date = lambda x: pd.to_datetime(x.date).dt.date))
+        
+        return df_out
         
     def _prep_data(self) -> pd.DataFrame: 
         

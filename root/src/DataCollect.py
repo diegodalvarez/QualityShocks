@@ -24,9 +24,11 @@ class DataCollect:
         if os.path.exists(self.raw_path) == False: os.makedirs(self.raw_path)
         if os.path.exists(self.prep_path) == False: os.makedirs(self.prep_path)
         
+        self.bbg_path = r"C:\Users\Diego\Desktop\app_prod\BBGData\data"
+        
     def get_vol(self, verbose: bool = False) -> pd.DataFrame: 
         
-        file_path = os.path.join(self.raw_path, "RawVIX.paruqet")
+        file_path = os.path.join(self.raw_path, "RawVIX.parquet")
         
         try:
         
@@ -46,7 +48,7 @@ class DataCollect:
             
     def prep_vix(self, verbose: bool = False) -> pd.DataFrame:
         
-        file_path = os.path.join(self.prep_path, "PrepVIX.paruqet")
+        file_path = os.path.join(self.prep_path, "PrepVIX.parquet")
         
         try:
         
@@ -71,9 +73,9 @@ class DataCollect:
             
         return df_out
     
-    def prep_quality(self, verbose: bool = False) -> pd.DataFrame: 
+    def _get_qmj(self, verbose: bool = False) -> pd.DataFrame: 
         
-        file_path = os.path.join(self.prep_path, "PrepQMJ.paruqet")
+        file_path = os.path.join(self.prep_path, "PrepQMJ.parquet")
         
         try:
         
@@ -100,11 +102,82 @@ class DataCollect:
             df_out.to_parquet(path = file_path, engine = "pyarrow")
             
         return df_out
+    
+    def _get_jpm(self, verbose: bool = False) -> pd.DataFrame: 
+        
+        file_path = os.path.join(self.prep_path, "PrepJPMQuality.parquet")
+        
+        try:
+        
+            if verbose == True: print("Trying to find prepped JPMorgan Quality data")
+            df_out = pd.read_parquet(path = file_path, engine = "pyarrow")
+            if verbose == True: print("Saving data\n")
+            
+        except:
+            
+            if verbose == True: print("Couldn't find data, collecting it now")
+        
+            paths = [
+                os.path.join(self.bbg_path, "JPQWIN.parquet"),
+                os.path.join(self.bbg_path, "JPQLAG.parquet")]
+            
+            df_out = (pd.read_parquet(
+                path = paths, engine = "pyarrow").
+                assign(security = lambda x: x.security.str.split(" ").str[0]).
+                pivot(index = "date", columns = "security", values = "value").
+                pct_change().
+                assign(
+                    value    = lambda x: x.JPQWIN - x.JPQLAG,
+                    variable = "quality")
+                [["value", "variable"]].
+                dropna().
+                reset_index())
+            
+            if verbose == True: print("Saving data\n")
+            df_out.to_parquet(path = file_path, engine = "pyarrow")
+            
+        return df_out
+    
+    def _get_bloomberg(self, verbose: bool = False) -> pd.DataFrame:
+        
+        file_path = os.path.join(self.prep_path, "PrepBloombergFactors.parquet")
+        
+        try:
+        
+            if verbose == True: print("Trying to find prepped JPMorgan Quality data")
+            df_out = pd.read_parquet(path = file_path, engine = "pyarrow")
+            if verbose == True: print("Saving data\n")
+            
+        except:
+            
+            if verbose == True: print("Couldn't find data, collecting it now")
+            
+            paths = [
+                os.path.join(self.bbg_path, "PEARNVUS.parquet"),
+                os.path.join(self.bbg_path, "PLEVERUS.parquet"),
+                os.path.join(self.bbg_path, "PPROFTUS.parquet")]
+            
+            df_out = (pd.read_parquet(
+                path = paths, engine = "pyarrow").
+                assign(security = lambda x: x.security.str.split(" ").str[0]).
+                pivot(index = "date", columns = "security", values = "value").
+                pct_change().
+                reset_index().
+                melt(id_vars = "date").
+                rename(columns = {"security": "variable"}).
+                dropna())
+            
+            if verbose == True: print("Saving data\n")
+            df_out.to_parquet(path = file_path, engine = "pyarrow")
+            
+        return df_out
 
 def main() -> None:
         
     DataCollect().get_vol(verbose = True)
     DataCollect().prep_vix(verbose = True)
-    DataCollect().prep_quality(verbose = True)
+    DataCollect()._get_qmj(verbose = True)
+    DataCollect()._get_jpm(verbose = True)
+    DataCollect()._get_bloomberg(verbose = True)
     
 if __name__ == "__main__": main()

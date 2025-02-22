@@ -6,7 +6,6 @@ Created on Mon Feb 17 11:04:58 2025
 """
 
 import os
-import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from   statsmodels.regression.rolling import RollingOLS

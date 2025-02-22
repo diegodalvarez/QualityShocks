@@ -24,7 +24,9 @@ class BootstrappedRegression(FullSampleRegression):
     
         self.num_samples  = 10_000
         self.sample_size  = 0.3
-        self.keep_tickers = ["europe", "global", "global_ex_usa", "pacific", "usa"]
+        self.keep_tickers = [
+            "europe", "global", "global_ex_usa", "pacific", "usa", "quality", 
+            "PLEVERUS", "PPROFTUS", "PEARNVUS"]
         
     def _bootstrap(self, df: pd.DataFrame) -> pd.DataFrame:
         
