@@ -1,5 +1,5 @@
 # QualityShocks
-Model for trading Equity QMJ based on a regression posted in teis Man AHL Article [Trend Following Loading the Dice](https://www.man.com/insights/trend-following-loading-the-dice)
+Model for trading Equity QMJ based on a regression posted in this Man AHL Article [Trend Following Loading the Dice](https://www.man.com/insights/trend-following-loading-the-dice)
 
 Within the writeup they build this regression, which the model will investigate.
 ![image](https://github.com/user-attachments/assets/eaaa3ef9-47af-426e-8b2f-66c2424a2fc5)
